@@ -1,0 +1,31 @@
+services:
+  # =========================================================
+  # 1. Layanan Broker MQTT: Eclipse Mosquitto
+  # =========================================================
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: mqtt-broker
+    restart: unless-stopped
+    ports:
+      - "1883:1883"  # Port MQTT murni untuk mikrokontroler
+      - "9001:9001"  # Port WebSockets untuk dashboard web
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  # =========================================================
+  # 2. Layanan Visual Rule Engine: Node-RED
+  # =========================================================
+  nodered:
+    image: nodered/node-red:latest
+    container_name: node-red
+    restart: unless-stopped
+    ports:
+      - "1880:1880"  # Port antarmuka web builder Node-RED
+    environment:
+      - TZ=Asia/Jakarta
+    volumes:
+      - ./nodered:/data
+    depends_on:
+      - mqtt
